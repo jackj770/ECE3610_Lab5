@@ -36,7 +36,12 @@ architecture Behavioral of top_controller is
     signal control_state : STATES := IDLE;
     signal select_signal : SELECT_STATE := SEL_RAM1;
     signal uart_tx_en : std_logic := '0';
+
+    
+    signal data_to_send : std_logic_vector(7 downto 0);
+
     signal p_data_in_buffer : std_logic_Vector(7 downto 0);
+
 
 
     component DA2_SPI is
@@ -114,9 +119,10 @@ architecture Behavioral of top_controller is
                                     clk => clk,
                                     rst => reset,
                                     en => uart_tx_en,
+                                    pdata_in => data_to_send,
                                     sdata => sdata_in,
                                     sdata_out => sdata_out,
-                                    pdata_in => p_data_in_buffer,
+                                    --pdata_in => p_data_in_buffer,
                                     pdata_out => control_sig,
                                     LED_out => LED_out
                                     );
