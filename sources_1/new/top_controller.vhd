@@ -122,7 +122,7 @@ architecture Behavioral of top_controller is
                                 rst => reset,
                                 VAUX1 => VAUX1,
                                 VAUX2 => VAUX2,
-                                LED_OUT => LED_out
+                                LED_OUT => pdata_in
             );
             
             RAM0 : blk_mem_gen_0 port map (
