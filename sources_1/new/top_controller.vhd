@@ -56,7 +56,8 @@ architecture Behavioral of top_controller is
     component UART_Top is
         Port (
               clk, rst, sdata, en : in std_logic;
-              sdata_out: out std_logic;                                                
+              sdata_out: out std_logic;            
+              pdata_in: in std_logic_vector(7 downto 0);                                    
               pdata_out: out std_logic_vector(7 downto 0);
               LED_out : out std_logic_vector(7 downto 0)
              );
