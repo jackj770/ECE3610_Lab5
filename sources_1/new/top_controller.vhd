@@ -17,7 +17,8 @@ entity top_controller is
 end top_controller;
 
 architecture Behavioral of top_controller is
-    type STATES is (IDLE, START, STOP, SEL_RAM1, SEL_RAM2, SEL_SW); 
+    type STATES is (IDLE, START, STOP);
+    type SELECT_STATE is (SEL_RAM1, SEL_RAM2, SEL_SW); 
     constant ADDRESS_MAX: integer := 100000;
     constant CLK_CONST_MAX: integer := 100000000/ADDRESS_MAX;    
     signal busy, load_s: std_logic := '0';
@@ -33,6 +34,7 @@ architecture Behavioral of top_controller is
     signal data_buffer_s : std_logic_vector(15 downto 0);
     signal control_sig : std_logic_vector(7 downto 0);
     signal control_state : STATES := IDLE;
+    signal select_signal : SELECT_STATE := SEL_RAM1;
 
 
     component DA2_SPI is
@@ -147,26 +149,37 @@ architecture Behavioral of top_controller is
         -- Switches = "g" "01100111"
         control_state <= START when control_sig = "01100001"
                       else STOP when control_sig = "01110011"
-                      else SEL_RAM1 when control_sig = "01100100"
-                      else SEL_RAM2 when control_sig = "01100110"
-                      else SEL_SW when control_sig = "01100111"
                       else IDLE;
+                      
+        select_signal <= SEL_RAM1 when control_sig = "01100100"
+                      else SEL_RAM2 when control_sig = "01100110"
+                      else SEL_SW;
         
         process(clk, reset)
             begin
-                case control_state is
-                    when IDLE =>
+                if rising_edge(clk) then
+                    case control_state is
+                        when IDLE =>
+                            
+                        when START =>
+                           
+                        when STOP =>
                         
-                    when START =>
-                    
-                    when STOP =>
-                    
-                    when SEL_RAM1 =>
-                    
-                    when SEl_RAM2 =>
-                    
-                    when SEL_SW =>
-                end case;
+                    end case;
+                end if;
+        end process;
+        
+        process(clk, reset)
+            begin
+                if rising_edge(clk) then
+                     case select_signal is
+                        when SEL_RAM1 =>
+                        
+                        when SEL_RAM2 =>
+                        
+                        when SEL_SW =>
+                    end case;
+                end if;
         end process;
         
         process(clk)
