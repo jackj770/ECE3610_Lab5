@@ -38,7 +38,7 @@ architecture Behavioral of top_controller is
     signal uart_tx_en : std_logic := '0';
 
     
-    signal data_to_send : std_logic_vector(7 downto 0);
+    signal data_to_send : std_logic_vector(15 downto 0);
 
     signal p_data_in_buffer : std_logic_Vector(7 downto 0);
 
@@ -119,7 +119,7 @@ architecture Behavioral of top_controller is
                                     clk => clk,
                                     rst => reset,
                                     en => uart_tx_en,
-                                    pdata_in => data_to_send,
+                                    pdata_in => p_data_in_buffer(15 downto 8),
                                     sdata => sdata_in,
                                     sdata_out => sdata_out,
                                     --pdata_in => p_data_in_buffer,
@@ -154,7 +154,7 @@ architecture Behavioral of top_controller is
         address_vector <= std_logic_vector(to_unsigned(address, address_vector'length)); --removed to_unsigned and also address_vector'length
         --toggle_display <= '1' when toggle = '1' else '0';
         
-        volt_actual <= to_integer(unsigned(data_in_top));
+        volt_actual <= to_integer(unsigned(data_buffer_s));
         
         data_buffer <= data_buffer_s when volt_actual < volt_max else std_logic_vector(to_unsigned(volt_max, data_buffer'length));
         
