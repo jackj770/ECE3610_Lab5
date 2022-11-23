@@ -5,7 +5,8 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity UART_Top is
      Port (clk, rst, sdata, en : in std_logic;
-               sdata_out, flag0, flag1, flag2: out std_logic;
+               sdata_out : out std_logic;
+               pdata_in: in std_logic_vector(7 downto 0);
                pdata_out: out std_logic_vector(7 downto 0);
                LED_out : out std_logic_vector(7 downto 0));
 end UART_Top;
@@ -16,8 +17,7 @@ component uart_rx is
     reset : in std_logic; -- reset, active high
     sdata : in std_logic; -- serial data in
     pdata : out std_logic_vector(7 downto 0); -- parallel data out
-    ready : out std_logic;
-    state_out: out std_logic_vector(2 downto 0)); -- ready strobe, active high
+    ready : out std_logic);
 end component;
 
 component uart_tx is
@@ -48,8 +48,8 @@ R: uart_rx port map(    clk => clk,
 T: uart_tx port map(   clk=> clk,
                            reset=> rst,
                            en => en,
-                           pdata=> data_s,
-                           load => rdy,
+                           pdata=> pdata_in,
+                           load => en,
                            busy => bsy,
                            sdata => sdata_out );
 -- checks signal data to find ascii
