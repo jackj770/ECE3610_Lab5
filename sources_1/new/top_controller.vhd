@@ -7,7 +7,7 @@ entity top_controller is
   Port(reset, clk: in std_logic;
        data_in_top: in std_logic_vector(5 downto 0);
        toggle : in std_logic;
-       sdata_in : in std_logic;
+       sdata_in, VAUX1, VAUX2 : in std_logic;
        sdata_out : out std_logic;
        toggle_display : out std_logic;
        LED_out : out std_logic_vector(7 downto 0);
@@ -36,8 +36,12 @@ architecture Behavioral of top_controller is
     signal control_state : STATES := IDLE;
     signal select_signal : SELECT_STATE := SEL_RAM1;
     signal uart_tx_en : std_logic := '0';
+
     
     signal data_to_send : std_logic_vector(7 downto 0);
+
+    signal p_data_in_buffer : std_logic_Vector(7 downto 0);
+
 
 
     component DA2_SPI is
@@ -48,7 +52,7 @@ architecture Behavioral of top_controller is
             reset : in std_logic; -- reset, active high
             load : in std_logic; -- notification to send data
             data_in : in std_logic_vector(15 downto 0); -- pdata in
-            VAUX1, VAUX2 : in std_logic;  -- this is for the xadc inputs
+            --VAUX1, VAUX2 : in std_logic;  -- this is for the xadc inputs
             sdata_0 : out std_logic; -- serial data out 1
             sdata_1 : out std_logic; -- serial data out 2
             spi_clk : out std_logic; -- clk out to SPI devices
@@ -118,6 +122,7 @@ architecture Behavioral of top_controller is
                                     pdata_in => data_to_send,
                                     sdata => sdata_in,
                                     sdata_out => sdata_out,
+                                    --pdata_in => p_data_in_buffer,
                                     pdata_out => control_sig,
                                     LED_out => LED_out
                                     );
@@ -125,7 +130,7 @@ architecture Behavioral of top_controller is
                                 rst => reset,
                                 VAUX1 => VAUX1,
                                 VAUX2 => VAUX2,
-                                LED_OUT => pdata_in
+                                LED_OUT => p_data_in_buffer
             );
             
             RAM0 : blk_mem_gen_0 port map (
