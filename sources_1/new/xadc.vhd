@@ -7,7 +7,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity xadc is
   Port (clk, rst : in std_logic;
         VAUX1, VAUX2 :in std_logic;
-        LED_OUT : out std_logic_vector(15 downto 0));
+        data_out : out std_logic_vector(15 downto 0));
 end xadc;
 
 architecture Behavioral of xadc is
@@ -88,5 +88,5 @@ your_instance_name : xadc_wiz_0
     busy_out => busy_out
   );
   daddr_in <= "00"&channel_out;
-  LED_OUT <= do_out;
+  data_out <= do_out;
 end Behavioral;

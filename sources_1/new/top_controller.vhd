@@ -9,7 +9,7 @@ entity top_controller is
        toggle : in std_logic;
        sdata_in, VAUX1, VAUX2 : in std_logic;
        sdata_out : out std_logic;
-       toggle_display : out std_logic;
+       --toggle_display : out std_logic;
        LED_out : out std_logic_vector(7 downto 0);
        load_button : in std_logic;
        CS0_n, spi_clk, sdata_0, sdata_1: out std_logic
@@ -19,7 +19,7 @@ end top_controller;
 architecture Behavioral of top_controller is
     type STATES is (IDLE, START, STOP);
     type SELECT_STATE is (SEL_RAM1, SEL_RAM2, SEL_SW); 
-    constant ADDRESS_MAX: integer := 100000;
+    constant ADDRESS_MAX: integer := 10000;
     constant CLK_CONST_MAX: integer := 100000000/ADDRESS_MAX;    
     signal busy, load_s: std_logic := '0';
     signal data_buffer: std_logic_vector(15 downto 0);
@@ -27,7 +27,7 @@ architecture Behavioral of top_controller is
     signal blk_data_buffer1 : std_logic_vector(11 downto 0);
     signal blk_data_buffer2 : std_logic_vector(11 downto 0);
     signal address : integer;
-    signal address_vector : std_logic_vector(16 downto 0);
+    signal address_vector : std_logic_vector(13 downto 0);
     signal load_da_bitch : std_logic:= '0';
     signal count_en : std_logic;
     signal volt_actual : integer;
@@ -38,9 +38,9 @@ architecture Behavioral of top_controller is
     signal uart_tx_en : std_logic := '0';
 
     
-    signal data_to_send : std_logic_vector(7 downto 0);
+    signal data_to_send : std_logic_vector(15 downto 0);
 
-    signal p_data_in_buffer : std_logic_Vector(7 downto 0);
+--    signal p_data_in_buffer : std_logic_Vector(7 downto 0);
 
 
 
@@ -74,30 +74,30 @@ architecture Behavioral of top_controller is
       Port (
             clk, rst : in std_logic;
             VAUX1, VAUX2 :in std_logic;
-            LED_OUT : out std_logic_vector(15 downto 0)
+            data_out : out std_logic_vector(15 downto 0)
             );
     end component;
 
     component blk_mem_gen_0 IS
-          PORT (
+        PORT (
             clka : IN STD_LOGIC;
             ena : IN STD_LOGIC;
             wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-            addra : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
+            addra : IN STD_LOGIC_VECTOR(13 DOWNTO 0);
             dina : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
             douta : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
-          );
+        );
     END component;
     
     component blk_mem_gen_1 IS
-          PORT (
+        PORT (
             clka : IN STD_LOGIC;
             ena : IN STD_LOGIC;
             wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-            addra : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
+            addra : IN STD_LOGIC_VECTOR(13 DOWNTO 0);
             dina : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
             douta : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
-          );
+        );
     END component;
     
 
@@ -119,18 +119,18 @@ architecture Behavioral of top_controller is
                                     clk => clk,
                                     rst => reset,
                                     en => uart_tx_en,
-                                    pdata_in => data_to_send,
+                                    pdata_in => data_to_send(15 downto 8),
                                     sdata => sdata_in,
                                     sdata_out => sdata_out,
-                                    --pdata_in => p_data_in_buffer,
                                     pdata_out => control_sig,
                                     LED_out => LED_out
                                     );
+                                    
             UUT2: XADC port map(clk => clk, 
                                 rst => reset,
                                 VAUX1 => VAUX1,
                                 VAUX2 => VAUX2,
-                                LED_OUT => p_data_in_buffer
+                                data_out => data_to_send
             );
             
             RAM0 : blk_mem_gen_0 port map (
@@ -154,7 +154,7 @@ architecture Behavioral of top_controller is
         address_vector <= std_logic_vector(to_unsigned(address, address_vector'length)); --removed to_unsigned and also address_vector'length
         --toggle_display <= '1' when toggle = '1' else '0';
         
-        volt_actual <= to_integer(unsigned(data_in_top));
+        volt_actual <= to_integer(unsigned(data_buffer_s));
         
         data_buffer <= data_buffer_s when volt_actual < volt_max else std_logic_vector(to_unsigned(volt_max, data_buffer'length));
         
@@ -202,24 +202,24 @@ architecture Behavioral of top_controller is
         process(clk, reset)
             begin
                 if reset = '1' then
-                    select_signal <= SEL_SW;
+--                    select_signal <= SEL_SW;
                 elsif rising_edge(clk) then
                      case select_signal is
                         when SEL_RAM1 =>
-                            count_en <= '1';
-                            toggle_display <= '1';              
+
+--                            toggle_display <= '1';              
                             data_buffer_s <= "0000"&blk_data_buffer1;
                             load_s <= load_da_bitch;
                         when SEL_RAM2 =>
-                            count_en <= '1';
-                            toggle_display <= '1';              
+      
+--                            toggle_display <= '1';              
                             data_buffer_s <= "0000"&blk_data_buffer2;
                             load_s <= load_da_bitch;                     
                         when SEL_SW =>
-                            toggle_display <= '0';
+--                            toggle_display <= '0';
                             data_buffer_s(15 downto 0) <= "0000"&data_in_top&"000000";
                             load_s <= '1';
-                            count_en <= '0';
+
                     end case;
                 end if;
         end process;
