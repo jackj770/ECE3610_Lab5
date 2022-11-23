@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 entity spi_top is
   generic(Volt_Max : in integer := 12);
-  Port(reset, clk: in std_logic;
+  Port(reset, clk, flag0, flag1, flag2: in std_logic;
        data_in_top: in std_logic_vector(5 downto 0);
        toggle : in std_logic;
        toggle_display : out std_logic;
@@ -44,6 +44,8 @@ constant CLK_CONST_MAX: integer := 100000000/ADDRESS_MAX;
 signal busy, load_s: std_logic := '0';
 signal data_buffer: std_logic_vector(15 downto 0);
 signal blk_data_s : std_logic_vector(11 downto 0);
+signal blk_data_buffer1 : std_logic_vector(11 downto 0);
+signal blk_data_buffer2 : std_logic_vector(11 downto 0);
 signal address : integer;
 signal address_vector : std_logic_vector(16 downto 0);
 signal load_da_bitch : std_logic:= '0';
@@ -62,23 +64,33 @@ UUT: DA2_SPI port map(clk => clk,
                       CS0_n => CS0_n,
                       is_busy =>  busy );
 
-RAM : blk_mem_gen_1 port map (clka => not clk,
+RAM0 : blk_mem_gen_0 port map (clka => not clk,
                                ena => count_en ,
                                wea => "0",
                                addra => address_vector,
                                dina => x"000",
-                               douta => blk_data_s
+                               douta => blk_data_buffer1
+                               );
+                               
+RAM1 : blk_mem_gen_1 port map (clka => not clk,
+                               ena => count_en ,
+                               wea => "0",
+                               addra => address_vector,
+                               dina => x"000",
+                               douta => blk_data_buffer2
                                );
                          
 address_vector <= std_logic_vector(to_unsigned(address, address_vector'length)); --removed to_unsigned and also address_vector'length
 --toggle_display <= '1' when toggle = '1' else '0';
 volt_actual <= to_integer(unsigned(data_in_top));
 data_in_s<= data_in_top when volt_actual < volt_max else std_logic_vector(to_unsigned(volt_max, data_in_s'length));
+blk_data_s <= blk_data_buffer1 when flag0 = '1' else blk_data_buffer2 when flag1 = '1' else blk_data_s;
+
 
 process(clk)
     begin
         if rising_edge(clk) then
-            if toggle = '1' then
+            if flag2 = '1' then
                 toggle_display <= '0';
                 data_buffer(15 downto 0) <= "0000"&data_in_s&"000000";
                 load_s <= '1';

@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity UART_Top is
      Port (clk, rst, sdata : in std_logic;
-               sdata_out: out std_logic;
+               sdata_out, flag0, flag1, flag2: out std_logic;
                pdata_out: out std_logic_vector(7 downto 0);
                LED_out : out std_logic_vector(7 downto 0));
 end UART_Top;
@@ -50,5 +50,19 @@ T: uart_tx port map(   clk=> clk,
                            load => rdy,
                            busy => bsy,
                            sdata => sdata_out );
+process(data)
+begin
+    if data = "01110111" then -- W (waveform1)
+        flag0 <= '1';
+    elsif data = "01101111" then -- O (Waveform2)
+        flag1 <= '1';
+    elsif data = "01110000" then -- P (Switches)
+        flag2 <= '1';
+    else
+        flag0 <= '0';
+        flag1 <= '0';
+        flag2 <= '0';
+    end if;
+end process;
 
 end Behavioral;
