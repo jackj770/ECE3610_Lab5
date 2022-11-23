@@ -6,6 +6,7 @@ use ieee.numeric_std.all;
 entity uart_tx is
     port ( clk : in std_logic; -- clock input
     reset : in std_logic; -- reset, active high
+    en : in std_logic;
     pdata : in std_logic_vector(7 downto 0); -- parallel data in
     load : in std_logic; -- load signal, active high
     busy : out std_logic; -- busy indicator
@@ -54,7 +55,7 @@ begin
                             f_count <= f_count - 1; 
                         end if;
                     when DATA => -- Transmit State
-                     
+                     if en = '1' then 
                         if bit_counter <= 9 and f_count <= 0 then
                             sdata <= P_data_buffer(bit_counter);
                             f_count <= FULL_COUNT;
@@ -68,8 +69,10 @@ begin
                         else
                             f_count <= f_count - 1;
                             state_tx <= DATA;
-
                         end if;
+                     else
+                        state_tx <= DATA;
+                     end if;
                     when STOP_BIT =>                        
                         if f_count <= half_count then
                             state_tx <= IDLE;

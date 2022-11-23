@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 
 entity UART_Top is
-     Port (clk, rst, sdata : in std_logic;
+     Port (clk, rst, sdata, en : in std_logic;
                sdata_out, flag0, flag1, flag2: out std_logic;
                pdata_out: out std_logic_vector(7 downto 0);
                LED_out : out std_logic_vector(7 downto 0));
@@ -23,6 +23,7 @@ end component;
 component uart_tx is
     port ( clk : in std_logic; -- clock input
     reset : in std_logic; -- reset, active high
+    en : in std_logic;
     pdata : in std_logic_vector(7 downto 0); -- parallel data in
     load : in std_logic; -- load signal, active high
     busy : out std_logic; -- busy indicator
@@ -46,24 +47,25 @@ R: uart_rx port map(    clk => clk,
                          ready => rdy );
 T: uart_tx port map(   clk=> clk,
                            reset=> rst,
+                           en => en,
                            pdata=> data,
                            load => rdy,
                            busy => bsy,
                            sdata => sdata_out );
-#checks signal data to find ascii
-process(data)
-begin
-    if data = "01110111" then -- W (waveform1)
-        flag0 <= '1';
-    elsif data = "01101111" then -- O (Waveform2)
-        flag1 <= '1';
-    elsif data = "01110000" then -- P (Switches)
-        flag2 <= '1';
-    else
-        flag0 <= '0';
-        flag1 <= '0';
-        flag2 <= '0';
-    end if;
-end process;
+-- checks signal data to find ascii
+--process(data)
+--begin
+--    if data = "01110111" then -- W (waveform1)
+--        flag0 <= '1';
+--    elsif data = "01101111" then -- O (Waveform2)
+--        flag1 <= '1';
+--    elsif data = "01110000" then -- P (Switches)
+--        flag2 <= '1';
+--    else
+--        flag0 <= '0';
+--        flag1 <= '0';
+--        flag2 <= '0';
+--    end if;
+--end process;
 
 end Behavioral;

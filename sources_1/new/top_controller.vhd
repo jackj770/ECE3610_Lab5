@@ -35,6 +35,7 @@ architecture Behavioral of top_controller is
     signal control_sig : std_logic_vector(7 downto 0);
     signal control_state : STATES := IDLE;
     signal select_signal : SELECT_STATE := SEL_RAM1;
+    signal uart_tx_en : std_logic := '0';
 
 
     component DA2_SPI is
@@ -54,7 +55,7 @@ architecture Behavioral of top_controller is
     
     component UART_Top is
         Port (
-              clk, rst, sdata : in std_logic;
+              clk, rst, sdata, en : in std_logic;
               sdata_out: out std_logic;                                                
               pdata_out: out std_logic_vector(7 downto 0);
               LED_out : out std_logic_vector(7 downto 0)
@@ -109,6 +110,7 @@ architecture Behavioral of top_controller is
             UUT1 : UART_Top port map (
                                     clk => clk,
                                     rst => reset,
+                                    en => uart_tx_en,
                                     sdata => sdata_in,
                                     sdata_out => sdata_out,
                                     pdata_out => control_sig,
@@ -157,13 +159,25 @@ architecture Behavioral of top_controller is
         
         process(clk, reset)
             begin
-                if rising_edge(clk) then
+                if reset = '1' then 
+                    count_en <= '0';
+                elsif rising_edge(clk) then
                     case control_state is
                         when IDLE =>
+                        -- XADC Stop
+                        -- This state might be useless
                             
                         when START =>
+                        -- XADC Start
+                        -- Start counter
+                        count_en <= '1';
+                        uart_tx_en <= '1';
                            
                         when STOP =>
+                        -- XADC Stop
+                        -- Stop Counter
+                        count_en <= '0';
+                        uart_tx_en <= '0';
                         
                     end case;
                 end if;
@@ -178,6 +192,7 @@ architecture Behavioral of top_controller is
                         when SEL_RAM2 =>
                         
                         when SEL_SW =>
+                            
                     end case;
                 end if;
         end process;
@@ -190,7 +205,7 @@ architecture Behavioral of top_controller is
                         toggle_display <= '0';
                         data_buffer_s(15 downto 0) <= "0000"&data_in_top&"000000";
                         load_s <= '1';
-                        count_en <= '0';
+                        
                 -- RAM         
                      else
                         count_en <= '1';
