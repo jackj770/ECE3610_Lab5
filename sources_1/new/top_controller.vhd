@@ -46,6 +46,7 @@ architecture Behavioral of top_controller is
             reset : in std_logic; -- reset, active high
             load : in std_logic; -- notification to send data
             data_in : in std_logic_vector(15 downto 0); -- pdata in
+            VAUX1, VAUX2 : in std_logic;  -- this is for the xadc inputs
             sdata_0 : out std_logic; -- serial data out 1
             sdata_1 : out std_logic; -- serial data out 2
             spi_clk : out std_logic; -- clk out to SPI devices
@@ -116,6 +117,12 @@ architecture Behavioral of top_controller is
                                     pdata_out => control_sig,
                                     LED_out => LED_out
                                     );
+            UUT2: XADC port map(clk => clk, 
+                                rst => reset,
+                                VAUX1 => VAUX1,
+                                VAUX2 => VAUX2,
+                                LED_OUT => LED_out
+            );
             
             RAM0 : blk_mem_gen_0 port map (
                                     clka => not clk,
@@ -186,7 +193,7 @@ architecture Behavioral of top_controller is
         process(clk, reset)
             begin
                 if reset = '1' then
-                    select_signal <= SEL_SW
+                    select_signal <= SEL_SW;
                 elsif rising_edge(clk) then
                      case select_signal is
                         when SEL_RAM1 =>
@@ -208,24 +215,24 @@ architecture Behavioral of top_controller is
                 end if;
         end process;
         
-        process(clk)
-            begin
-                if rising_edge(clk) then
-                -- Switches
-                    if toggle = '1' then
-                        toggle_display <= '0';
-                        data_buffer_s(15 downto 0) <= "0000"&data_in_top&"000000";
-                        load_s <= '1';
+--        process(clk)
+--            begin
+--                if rising_edge(clk) then
+--                -- Switches
+--                    if toggle = '1' then
+--                        toggle_display <= '0';
+--                        data_buffer_s(15 downto 0) <= "0000"&data_in_top&"000000";
+--                        load_s <= '1';
                         
-                -- RAM         
-                     else
-                        count_en <= '1';
-                        toggle_display <= '1';              
-                        data_buffer_s <= "0000"&blk_data_s;
-                        load_s <= load_da_bitch;
-                     end if;
-                end if;
-        end process;
+--                -- RAM         
+--                     else
+--                        count_en <= '1';
+--                        toggle_display <= '1';              
+--                        data_buffer_s <= "0000"&blk_data_s;
+--                        load_s <= load_da_bitch;
+--                     end if;
+--                end if;
+--        end process;
         
         -- Coutner Loop
         process(clk, reset)
