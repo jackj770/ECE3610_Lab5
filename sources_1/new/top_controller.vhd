@@ -8,7 +8,7 @@ entity top_controller is
        data_in_top: in std_logic_vector(5 downto 0);
        toggle : in std_logic;
        sdata_in : in std_logic;
-       sdata_out : in std_logic;
+       sdata_out : out std_logic;
        toggle_display : out std_logic;
        LED_out : out std_logic_vector(7 downto 0);
        load_button : in std_logic;
@@ -185,14 +185,25 @@ architecture Behavioral of top_controller is
         
         process(clk, reset)
             begin
-                if rising_edge(clk) then
+                if reset = '1' then
+                    select_signal <= SEL_SW
+                elsif rising_edge(clk) then
                      case select_signal is
                         when SEL_RAM1 =>
-                        
+                            count_en <= '1';
+                            toggle_display <= '1';              
+                            data_buffer_s <= "0000"&blk_data_buffer1;
+                            load_s <= load_da_bitch;
                         when SEL_RAM2 =>
-                        
+                            count_en <= '1';
+                            toggle_display <= '1';              
+                            data_buffer_s <= "0000"&blk_data_buffer2;
+                            load_s <= load_da_bitch;                     
                         when SEL_SW =>
-                            
+                            toggle_display <= '0';
+                            data_buffer_s(15 downto 0) <= "0000"&data_in_top&"000000";
+                            load_s <= '1';
+                            count_en <= '0';
                     end case;
                 end if;
         end process;
