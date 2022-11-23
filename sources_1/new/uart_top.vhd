@@ -50,6 +50,7 @@ T: uart_tx port map(   clk=> clk,
                            load => rdy,
                            busy => bsy,
                            sdata => sdata_out );
+#checks signal data to find ascii
 process(data)
 begin
     if data = "01110111" then -- W (waveform1)

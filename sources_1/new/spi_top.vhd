@@ -84,7 +84,7 @@ address_vector <= std_logic_vector(to_unsigned(address, address_vector'length));
 --toggle_display <= '1' when toggle = '1' else '0';
 volt_actual <= to_integer(unsigned(data_in_top));
 data_in_s<= data_in_top when volt_actual < volt_max else std_logic_vector(to_unsigned(volt_max, data_in_s'length));
-blk_data_s <= blk_data_buffer1 when flag0 = '1' else blk_data_buffer2 when flag1 = '1' else blk_data_s;
+blk_data_s <= blk_data_buffer1 when flag0 = '1' else blk_data_buffer2 when flag1 = '1' else blk_data_s; #switches between the waveform
 
 
 process(clk)
