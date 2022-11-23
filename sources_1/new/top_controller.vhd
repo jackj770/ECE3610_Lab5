@@ -138,23 +138,35 @@ architecture Behavioral of top_controller is
         
         data_buffer <= data_buffer_s when volt_actual < volt_max else std_logic_vector(to_unsigned(volt_max, data_buffer'length));
         
-        control_state <= 
-        
-        
         -- Top Level Control
         -- Takes control sig from UART and determines what to do
-        -- Start = "s" "01110011"
-        -- Stop = "" ""
-        -- RAM 1 = "" ""
-        -- RAM 2 = "" ""
-        -- Switches = "" ""
+        -- Start = "a" "01100001"
+        -- Stop = "s" "01110011"
+        -- RAM 1 = "d" "01100100"
+        -- RAM 2 = "f" "01100110"
+        -- Switches = "g" "01100111"
+        control_state <= START when control_sig = "01100001"
+                      else STOP when control_sig = "01110011"
+                      else SEL_RAM1 when control_sig = "01100100"
+                      else SEL_RAM2 when control_sig = "01100110"
+                      else SEL_SW when control_sig = "01100111"
+                      else IDLE;
         
-        
-        
-        process(clk)
+        process(clk, reset)
             begin
-                case control_sig is
-                    when 
+                case control_state is
+                    when IDLE =>
+                        
+                    when START =>
+                    
+                    when STOP =>
+                    
+                    when SEL_RAM1 =>
+                    
+                    when SEl_RAM2 =>
+                    
+                    when SEL_SW =>
+                end case;
         end process;
         
         process(clk)
