@@ -88,5 +88,5 @@ your_instance_name : xadc_wiz_0
     busy_out => busy_out
   );
   daddr_in <= "00"&channel_out;
-  LED_OUT <= do_out;
+    <= do_out;
 end Behavioral;
