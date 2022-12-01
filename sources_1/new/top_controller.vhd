@@ -36,13 +36,13 @@ architecture Behavioral of top_controller is
     signal control_state : STATES := IDLE;
     signal select_signal : SELECT_STATE := SEL_RAM1;
     signal uart_tx_en : std_logic := '0';
+    signal state_debug : std_logic_vector(3 downto 0);
+    signal select_debug : std_logic_vector(3 downto 0);
 
     
     signal data_to_send : std_logic_vector(15 downto 0);
 
---    signal p_data_in_buffer : std_logic_Vector(7 downto 0);
-
-
+--    signal p_data_in_buffer : std_logic_Vector(7 downto 0);   
 
     component DA2_SPI is
     -- spi_clk_f is limited to 30 MHz for DA2
@@ -65,8 +65,8 @@ architecture Behavioral of top_controller is
               clk, rst, sdata, en : in std_logic;
               sdata_out: out std_logic;            
               pdata_in: in std_logic_vector(7 downto 0);                                    
-              pdata_out: out std_logic_vector(7 downto 0);
-              LED_out : out std_logic_vector(7 downto 0)
+              pdata_out: out std_logic_vector(7 downto 0)
+--              LED_out : out std_logic_vector(7 downto 0)
              );
     end component;
    
@@ -122,15 +122,16 @@ architecture Behavioral of top_controller is
                                     pdata_in => data_to_send(15 downto 8),
                                     sdata => sdata_in,
                                     sdata_out => sdata_out,
-                                    pdata_out => control_sig,
-                                    LED_out => LED_out
+                                    pdata_out => control_sig
+--                                    LED_out => LED_out
                                     );
                                     
-            UUT2: XADC port map(clk => clk, 
-                                rst => reset,
-                                VAUX1 => VAUX1,
-                                VAUX2 => VAUX2,
-                                data_out => data_to_send
+            UUT2: XADC port map(
+                                    clk => clk, 
+                                    rst => reset,
+                                    VAUX1 => VAUX1,
+                                    VAUX2 => VAUX2,
+                                    data_out => data_to_send
             );
             
             RAM0 : blk_mem_gen_0 port map (
@@ -172,6 +173,8 @@ architecture Behavioral of top_controller is
         select_signal <= SEL_RAM1 when control_sig = "01100100"
                       else SEL_RAM2 when control_sig = "01100110"
                       else SEL_SW;
+--        LED_out <= state_debug & select_debug;
+          LED_out <= data_to_send(15 downto 8);
         
         process(clk, reset)
             begin
@@ -182,18 +185,24 @@ architecture Behavioral of top_controller is
                         when IDLE =>
                         -- XADC Stop
                         -- This state might be useless
+                        state_debug <= "1000";
                             
                         when START =>
                         -- XADC Start
                         -- Start counter
                         count_en <= '1';
                         uart_tx_en <= '1';
+                        state_debug <= "0100";
                            
                         when STOP =>
                         -- XADC Stop
                         -- Stop Counter
                         count_en <= '0';
                         uart_tx_en <= '0';
+                        state_debug <= "0010";
+                        
+--                        when others =>
+                            
                         
                     end case;
                 end if;
@@ -206,16 +215,17 @@ architecture Behavioral of top_controller is
                 elsif rising_edge(clk) then
                      case select_signal is
                         when SEL_RAM1 =>
-
+                            select_debug <= "1000";
 --                            toggle_display <= '1';              
                             data_buffer_s <= "0000"&blk_data_buffer1;
                             load_s <= load_da_bitch;
                         when SEL_RAM2 =>
-      
+                            select_debug <= "0100";    
 --                            toggle_display <= '1';              
                             data_buffer_s <= "0000"&blk_data_buffer2;
                             load_s <= load_da_bitch;                     
                         when SEL_SW =>
+                            select_debug <= "0010";
 --                            toggle_display <= '0';
                             data_buffer_s(15 downto 0) <= "0000"&data_in_top&"000000";
                             load_s <= '1';

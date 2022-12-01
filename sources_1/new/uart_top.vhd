@@ -7,8 +7,9 @@ entity UART_Top is
      Port (clk, rst, sdata, en : in std_logic;
                sdata_out : out std_logic;
                pdata_in: in std_logic_vector(7 downto 0);
-               pdata_out: out std_logic_vector(7 downto 0);
-               LED_out : out std_logic_vector(7 downto 0));
+               pdata_out: out std_logic_vector(7 downto 0)
+--               LED_out : out std_logic_vector(7 downto 0)
+               );
 end UART_Top;
 
 architecture Behavioral of UART_Top is
@@ -39,7 +40,7 @@ signal bsy: std_logic;
 --signal rset: std_logic:=rst;
 
 begin
-LED_out<= data;
+--LED_out<= data;
 R: uart_rx port map(    clk => clk,
                          reset => rst,
                          sdata => sdata,
@@ -48,7 +49,7 @@ R: uart_rx port map(    clk => clk,
 T: uart_tx port map(   clk=> clk,
                            reset=> rst,
                            en => en,
-                           pdata=> pdata_in,
+                           pdata => pdata_in,
                            load => en,
                            busy => bsy,
                            sdata => sdata_out );
