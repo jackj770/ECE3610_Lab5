@@ -168,13 +168,13 @@ architecture Behavioral of top_controller is
         -- RAM 1 = "d" "01100100"
         -- RAM 2 = "f" "01100110"
         -- Switches = "g" "01100111"
-        control_state <= START when control_sig = "01100001"
-                      else STOP when control_sig = "01110011"
+        control_state <= START when control_sig = "01100001" --a
+                      else STOP when control_sig = "01110011" --s
                       else IDLE;
                       
-        select_signal <= SEL_RAM1 when control_sig = "01100100"
-                      else SEL_RAM2 when control_sig = "01100110"
-                      else SEL_SW;
+        select_signal <= SEL_RAM1 when control_sig = "01100100" --d
+                      else SEL_RAM2 when control_sig = "01100110" --f
+                      else SEL_SW when control_sig = "01100111";
 --        LED_out <= state_debug & select_debug;
           LED_out <= data_to_send(15 downto 8);
         
