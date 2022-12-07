@@ -110,7 +110,7 @@ architecture Behavioral of top_controller is
                                     data_in => data_buffer,
                                     sdata_0 => sdata_0,
                                     sdata_1 => sdata_0,
-                                    spi_clk => spi_clk,
+                                    spi_clk => spi_clk_s,
                                     CS0_n => CS0_n,
                                     is_busy =>  busy
                                     );
@@ -151,7 +151,9 @@ architecture Behavioral of top_controller is
                                     dina => x"000",
                                     douta => blk_data_buffer2
                                     );
-                                 
+                                  
+        spi_clk   <= spi_clk_s;
+
         address_vector <= std_logic_vector(to_unsigned(address, address_vector'length)); --removed to_unsigned and also address_vector'length
         --toggle_display <= '1' when toggle = '1' else '0';
         
@@ -208,11 +210,11 @@ architecture Behavioral of top_controller is
                 end if;
         end process;
         
-        process(clk, reset)
+        process(spi_clk_s, reset)
             begin
                 if reset = '1' then
 --                    select_signal <= SEL_SW;
-                elsif rising_edge(clk) then
+                elsif rising_edge(spi_clk_s) then
                      case select_signal is
                         when SEL_RAM1 =>
                             select_debug <= "1000";
@@ -254,12 +256,12 @@ architecture Behavioral of top_controller is
 --        end process;
         
         -- Coutner Loop
-        process(clk, reset)
+        process(spi_clk_s, reset)
             begin
                 if reset = '1' then
                     address <= 0;
                     load_da_bitch <= '0';
-                elsif rising_edge(clk) and count_en = '1' then
+                elsif rising_edge(spi_clk_s) and count_en = '1' then
                     load_da_bitch <= '0';
                     if address < ADDRESS_MAX and busy = '1' then
                         address <= address + 1;
