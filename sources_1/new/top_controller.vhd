@@ -24,8 +24,8 @@ architecture Behavioral of top_controller is
     signal busy, load_s: std_logic := '0';
     signal data_buffer: std_logic_vector(15 downto 0);
     signal blk_data_s : std_logic_vector(11 downto 0);
-    signal blk_data_buffer1 : std_logic_vector(11 downto 0);
-    signal blk_data_buffer2 : std_logic_vector(11 downto 0);
+    signal blk_data_buffer_ramp : std_logic_vector(11 downto 0);
+    signal blk_data_buffer_sine : std_logic_vector(11 downto 0);
     signal address : integer;
     signal address_vector : std_logic_vector(15 downto 0);
     signal load_da_bitch : std_logic:= '0';
@@ -142,7 +142,7 @@ architecture Behavioral of top_controller is
                                     wea => "0",
                                     addra => address_vector,
                                     dina => x"000",
-                                    douta => blk_data_buffer1
+                                    douta => blk_data_buffer_ramp
                                     );
                                           
             RAM1 : blk_mem_gen_sine port map (
@@ -151,11 +151,11 @@ architecture Behavioral of top_controller is
                                     wea => "0",
                                     addra => address_vector,
                                     dina => x"000",
-                                    douta => blk_data_buffer2
+                                    douta => blk_data_buffer_sine
                                     );
                                   
         spi_clk <= spi_clk_s;
-
+        load_s <= '1';
         address_vector <= std_logic_vector(to_unsigned(address, address_vector'length)); --removed to_unsigned and also address_vector'length
         --toggle_display <= '1' when toggle = '1' else '0';
         
