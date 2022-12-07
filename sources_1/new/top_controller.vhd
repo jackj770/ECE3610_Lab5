@@ -24,8 +24,8 @@ architecture Behavioral of top_controller is
     signal busy, load_s: std_logic := '0';
     signal data_buffer: std_logic_vector(15 downto 0);
     signal blk_data_s : std_logic_vector(11 downto 0);
-    signal blk_data_buffer1 : std_logic_vector(11 downto 0);
-    signal blk_data_buffer2 : std_logic_vector(11 downto 0);
+    signal blk_data_buffer_ramp : std_logic_vector(11 downto 0);
+    signal blk_data_buffer_sine : std_logic_vector(11 downto 0);
     signal address : integer;
     signal address_vector : std_logic_vector(15 downto 0);
     signal load_da_bitch : std_logic:= '0';
@@ -142,7 +142,7 @@ architecture Behavioral of top_controller is
                                     wea => "0",
                                     addra => address_vector,
                                     dina => x"000",
-                                    douta => blk_data_buffer1
+                                    douta => blk_data_buffer_ramp
                                     );
                                           
             RAM1 : blk_mem_gen_sine port map (
@@ -151,11 +151,11 @@ architecture Behavioral of top_controller is
                                     wea => "0",
                                     addra => address_vector,
                                     dina => x"000",
-                                    douta => blk_data_buffer2
+                                    douta => blk_data_buffer_sine
                                     );
                                   
         spi_clk <= spi_clk_s;
-
+        load_s <= '1';
         address_vector <= std_logic_vector(to_unsigned(address, address_vector'length)); --removed to_unsigned and also address_vector'length
         --toggle_display <= '1' when toggle = '1' else '0';
         
@@ -219,18 +219,18 @@ architecture Behavioral of top_controller is
                         when SEL_RAM1 =>
                             select_debug <= "1000";
 --                            toggle_display <= '1';              
-                            data_buffer_s <= "0000"&blk_data_buffer1;
-                            load_s <= load_da_bitch;
+                            data_buffer_s <= "0000"&blk_data_buffer_ramp;
+--                            load_s <= load_da_bitch;
                         when SEL_RAM2 =>
                             select_debug <= "0100";    
 --                            toggle_display <= '1';              
-                            data_buffer_s <= "0000"&blk_data_buffer2;
-                            load_s <= load_da_bitch;                     
+                            data_buffer_s <= "0000"&blk_data_buffer_sine;
+--                            load_s <= load_da_bitch;                     
                         when SEL_SW =>
                             select_debug <= "0010";
 --                            toggle_display <= '0';
                             data_buffer_s(15 downto 0) <= "0000"&data_in_top&"000000";
-                            load_s <= '1';
+--                            load_s <= '1';
                     end case;
                 end if;
         end process;
