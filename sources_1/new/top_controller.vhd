@@ -38,6 +38,8 @@ architecture Behavioral of top_controller is
     signal uart_tx_en : std_logic := '0';
     signal state_debug : std_logic_vector(3 downto 0);
     signal select_debug : std_logic_vector(3 downto 0);
+    
+    signal spi_clk_s : std_logic;
 
     
     signal data_to_send : std_logic_vector(15 downto 0);
