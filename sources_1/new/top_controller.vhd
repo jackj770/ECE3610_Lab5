@@ -78,26 +78,26 @@ architecture Behavioral of top_controller is
             );
     end component;
 
-    component blk_mem_gen_0 IS
-        PORT (
-            clka : IN STD_LOGIC;
-            ena : IN STD_LOGIC;
-            wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-            addra : IN STD_LOGIC_VECTOR(13 DOWNTO 0);
-            dina : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
-            douta : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
-        );
+   component blk_mem_gen_ramp IS
+              PORT (
+                clka : IN STD_LOGIC;
+                ena : IN STD_LOGIC;
+                wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+                addra : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+                dina : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
+                douta : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
+              );
     END component;
     
-    component blk_mem_gen_1 IS
-        PORT (
-            clka : IN STD_LOGIC;
-            ena : IN STD_LOGIC;
-            wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-            addra : IN STD_LOGIC_VECTOR(13 DOWNTO 0);
-            dina : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
-            douta : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
-        );
+    component blk_mem_gen_sine IS
+      PORT (
+        clka : IN STD_LOGIC;
+        ena : IN STD_LOGIC;
+        wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+        addra : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        dina : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
+        douta : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
+      );
     END component;
     
 
@@ -134,7 +134,7 @@ architecture Behavioral of top_controller is
                                     data_out => data_to_send
             );
             
-            RAM0 : blk_mem_gen_0 port map (
+            RAM0 : blk_mem_gen_ramp port map (
                                     clka => not clk,
                                     ena => count_en ,
                                     wea => "0",
@@ -143,7 +143,7 @@ architecture Behavioral of top_controller is
                                     douta => blk_data_buffer1
                                     );
                                           
-            RAM1 : blk_mem_gen_1 port map (
+            RAM1 : blk_mem_gen_sine port map (
                                     clka => not clk,
                                     ena => count_en ,
                                     wea => "0",
