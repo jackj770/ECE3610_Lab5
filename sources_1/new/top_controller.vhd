@@ -19,7 +19,7 @@ end top_controller;
 architecture Behavioral of top_controller is
     type STATES is (IDLE, START, STOP);
     type SELECT_STATE is (SEL_RAM1, SEL_RAM2, SEL_SW); 
-    constant ADDRESS_MAX: integer := 10000;
+    constant ADDRESS_MAX: integer := 50000;
     constant CLK_CONST_MAX: integer := 100000000/ADDRESS_MAX;    
     signal busy, load_s: std_logic := '0';
     signal data_buffer: std_logic_vector(15 downto 0);
@@ -154,7 +154,7 @@ architecture Behavioral of top_controller is
                                     douta => blk_data_buffer2
                                     );
                                   
-        spi_clk   <= spi_clk_s;
+        spi_clk <= spi_clk_s;
 
         address_vector <= std_logic_vector(to_unsigned(address, address_vector'length)); --removed to_unsigned and also address_vector'length
         --toggle_display <= '1' when toggle = '1' else '0';
@@ -205,10 +205,7 @@ architecture Behavioral of top_controller is
                         count_en <= '0';
                         uart_tx_en <= '0';
                         state_debug <= "0010";
-                        
---                        when others =>
-                            
-                        
+
                     end case;
                 end if;
         end process;
@@ -217,7 +214,7 @@ architecture Behavioral of top_controller is
             begin
                 if reset = '1' then
 --                    select_signal <= SEL_SW;
-                elsif rising_edge(spi_clk_s) then
+                elsif rising_edge(clk) then
                      case select_signal is
                         when SEL_RAM1 =>
                             select_debug <= "1000";
@@ -234,41 +231,18 @@ architecture Behavioral of top_controller is
 --                            toggle_display <= '0';
                             data_buffer_s(15 downto 0) <= "0000"&data_in_top&"000000";
                             load_s <= '1';
-
                     end case;
                 end if;
         end process;
-        
---        process(clk)
---            begin
---                if rising_edge(clk) then
---                -- Switches
---                    if toggle = '1' then
---                        toggle_display <= '0';
---                        data_buffer_s(15 downto 0) <= "0000"&data_in_top&"000000";
---                        load_s <= '1';
-                        
---                -- RAM         
---                     else
---                        count_en <= '1';
---                        toggle_display <= '1';              
---                        data_buffer_s <= "0000"&blk_data_s;
---                        load_s <= load_da_bitch;
---                     end if;
---                end if;
---        end process;
-        
+    
         -- Coutner Loop
-        process(spi_clk_s, reset)
+        process(clk, reset)
             begin
                 if reset = '1' then
                     address <= 0;
-                    load_da_bitch <= '0';
-                elsif rising_edge(spi_clk_s) and count_en = '1' then
-                    load_da_bitch <= '0';
+                elsif rising_edge(clk) and count_en = '1' then
                     if address < ADDRESS_MAX and busy = '1' then
                         address <= address + 1;
-                        load_da_bitch <= '1';
                     elsif address = ADDRESS_MAX then
                         address <= 0;
                     end if;
