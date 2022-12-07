@@ -173,9 +173,9 @@ architecture Behavioral of top_controller is
         control_state <= START when control_sig = "01100001" --a
                       else STOP when control_sig = "01110011"; --s
                       
-        select_signal <= SEL_RAM1 when control_sig = "01100100" --d
-                      else SEL_RAM2 when control_sig = "01100110" --f
-                      else SEL_SW when control_sig = "01100111"; --g
+        pdata_in <= "0000"&blk_data_buffer1 when control_sig = "01100100" --d
+                      else "0000"&blk_data_buffer2 when control_sig = "01100110" --f
+                      else "0000"&data_in_top&"000000" when control_sig = "01100111"; --g
 
         LED_out <= state_debug & select_debug;
 --          LED_out <= data_to_send(15 downto 8);
@@ -210,30 +210,30 @@ architecture Behavioral of top_controller is
                 end if;
         end process;
         
-        process(clk, reset)
-            begin
-                if reset = '1' then
---                    select_signal <= SEL_SW;
-                elsif rising_edge(clk) then
-                     case select_signal is
-                        when SEL_RAM1 =>
-                            select_debug <= "1000";
---                            toggle_display <= '1';              
-                            data_buffer_s <= "0000"&blk_data_buffer1;
-                            load_s <= load_da_bitch;
-                        when SEL_RAM2 =>
-                            select_debug <= "0100";    
---                            toggle_display <= '1';              
-                            data_buffer_s <= "0000"&blk_data_buffer2;
-                            load_s <= load_da_bitch;                     
-                        when SEL_SW =>
-                            select_debug <= "0010";
---                            toggle_display <= '0';
-                            data_buffer_s(15 downto 0) <= "0000"&data_in_top&"000000";
-                            load_s <= '1';
-                    end case;
-                end if;
-        end process;
+--         process(clk, reset)
+--             begin
+--                 if reset = '1' then
+-- --                    select_signal <= SEL_SW;
+--                 elsif rising_edge(clk) then
+--                      case select_signal is
+--                         when SEL_RAM1 =>
+--                             select_debug <= "1000";
+-- --                            toggle_display <= '1';              
+--                             data_buffer_s <= ;
+--                             load_s <= load_da_bitch;
+--                         when SEL_RAM2 =>
+--                             select_debug <= "0100";    
+-- --                            toggle_display <= '1';              
+--                             data_buffer_s <= ;
+--                             load_s <= load_da_bitch;                     
+--                         when SEL_SW =>
+--                             select_debug <= "0010";
+-- --                            toggle_display <= '0';
+--                             data_buffer_s(15 downto 0) <= ;
+--                             load_s <= '1';
+--                     end case;
+--                 end if;
+--         end process;
     
         -- Coutner Loop
         process(clk, reset)
