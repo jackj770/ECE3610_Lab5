@@ -1,4 +1,4 @@
-import pyserial 
+import serial 
 
 ser = 0
 
