@@ -48,7 +48,7 @@ begin
                         end if;
                     when START_BIT =>
                         busy <= '1';
-                        if load = '0' and f_count <= 0 then
+                        if f_count <= 0 then
                             state_tx <= DATA;
                             f_count <= FULL_COUNT;
                         else
