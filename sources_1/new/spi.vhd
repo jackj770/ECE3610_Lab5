@@ -7,7 +7,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity DA2_SPI is
 -- spi_clk_f is limited to 30 MHz for DA2
 generic(m_clk_f : in integer := 100e6;
-            spi_clk_f : in integer := 10e6);
+            spi_clk_f : in integer := 100e3);
             port ( clk : in std_logic; -- clock input
             reset : in std_logic; -- reset, active high
             load : in std_logic; -- notification to send data

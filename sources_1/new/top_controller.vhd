@@ -27,7 +27,7 @@ architecture Behavioral of top_controller is
     signal blk_data_buffer1 : std_logic_vector(11 downto 0);
     signal blk_data_buffer2 : std_logic_vector(11 downto 0);
     signal address : integer;
-    signal address_vector : std_logic_vector(13 downto 0);
+    signal address_vector : std_logic_vector(15 downto 0);
     signal load_da_bitch : std_logic:= '0';
     signal count_en : std_logic;
     signal volt_actual : integer;
@@ -49,7 +49,7 @@ architecture Behavioral of top_controller is
     component DA2_SPI is
     -- spi_clk_f is limited to 30 MHz for DA2
     generic(m_clk_f : in integer := 100e6;
-                spi_clk_f : in integer := 10e6);
+                spi_clk_f : in integer := 100e3);
     port ( clk : in std_logic; -- clock input
             reset : in std_logic; -- reset, active high
             load : in std_logic; -- notification to send data
@@ -176,8 +176,10 @@ architecture Behavioral of top_controller is
         select_signal <= SEL_RAM1 when control_sig = "01100100" --d
                       else SEL_RAM2 when control_sig = "01100110" --f
                       else SEL_SW when control_sig = "01100111"; --g
---        LED_out <= state_debug & select_debug;
-          LED_out <= data_to_send(15 downto 8);
+
+        LED_out <= state_debug & select_debug;
+--          LED_out <= data_to_send(15 downto 8);
+
         
         process(clk, reset)
             begin
@@ -211,7 +213,7 @@ architecture Behavioral of top_controller is
                 end if;
         end process;
         
-        process(spi_clk_s, reset)
+        process(clk, reset)
             begin
                 if reset = '1' then
 --                    select_signal <= SEL_SW;
